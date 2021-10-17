@@ -44,10 +44,6 @@ impl SimpleState for Pong {
         let world = data.world;
         let sprite_sheet_handle = load_sprite_sheet(world);
 
-        // register world entities manually
-        //  'Systems' would register automatically
-        world.register::<Paddle>();
-
         initialise_paddles(world, sprite_sheet_handle);
         initialise_camera(world);
     }
