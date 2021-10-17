@@ -1,6 +1,6 @@
-use amethyst::core::{Transform, SystemDesc};
+use amethyst::core::{Transform};
 use amethyst::derive::SystemDesc;
-use amethyst::ecs::{Join, Read, ReadStorage, System, SystemData, World, WriteStorage};
+use amethyst::ecs::{Join, Read, ReadStorage, System, SystemData, WriteStorage};
 use amethyst::input::{InputHandler, StringBindings};
 
 use crate::pong::{Paddle, Side, ARENA_HEIGHT, PADDLE_HEIGHT};
@@ -8,6 +8,11 @@ use crate::pong::{Paddle, Side, ARENA_HEIGHT, PADDLE_HEIGHT};
 #[derive(SystemDesc)]
 pub struct PaddleSystem;
 
+// Note: In a real game, we would use the time elapsed between frames 
+//  to determine how far to move the paddle, so that the behavior of
+//  the game would not be tied to the game's framerate. Amethyst provides
+//  you with `amethyst::core::timing::Time` for that purpose, but for
+//  now current approach should suffice.
 impl<'s> System<'s> for PaddleSystem {
     type SystemData = (
         WriteStorage<'s, Transform>,
@@ -22,13 +27,13 @@ impl<'s> System<'s> for PaddleSystem {
                 Side::Right => input.axis_value("right_paddle"),
             };
             if let Some(mv_amount) = movement {
-                if mv_amount != 0.0 {
-                    let side_name = match paddle.side {
-                        Side::Left => "left",
-                        Side::Right => "right",
-                    };
-                    println!("Side {:?} moving {}", side_name, mv_amount);
-                }
+               let scaled_amount = 1.2 * mv_amount as f32;
+               let paddle_y = transform.translation().y;
+               transform.set_translation_y(
+                   (paddle_y + scaled_amount)
+                        .min(ARENA_HEIGHT - PADDLE_HEIGHT * 0.5)
+                        .max(PADDLE_HEIGHT * 0.5),
+               );
             }
         }
     }
