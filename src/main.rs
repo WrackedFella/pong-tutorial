@@ -38,9 +38,15 @@ fn main() {
         ).unwrap()
         .with_bundle(input_bundle).unwrap() // contains 'input_system'
         .with_bundle(TransformBundle::new()).unwrap()
-        .with(systems::PaddleSystem, "paddle_system", &["input_system"]);
+        .with(systems::PaddleSystem, "paddle_system", &["input_system"])
+        .with(systems::MoveBallsSystem, "ball_system", &[])
+        .with(
+            systems::BounceSystem,
+            "collision_system",
+            &["paddle_system", "ball_system"],
+        );
 
     let assets_dir = app_root.join("assets");
-    let mut game = Application::new(assets_dir, Pong, game_data).unwrap();
+    let mut game = Application::new(assets_dir, Pong::default(), game_data).unwrap();
     game.run();
 }
